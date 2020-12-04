@@ -3,7 +3,7 @@
   "name": "Music Editor - Develop Local",
   "content_type": "SN|Component",
   "area": "editor-editor",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Music Editor for Standard Notes. Write music with VexTab and VexFlow",
   "url": "http://localhost:3000",
   "download_url": "",
