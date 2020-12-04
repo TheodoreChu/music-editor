@@ -19,6 +19,6 @@
     "url": "https://github.com/TheodoreChu/music-editor/issues"
   },
   "sn": {
-    "main": "build/index.html"
+    "main": "index.html"
   }
 }
