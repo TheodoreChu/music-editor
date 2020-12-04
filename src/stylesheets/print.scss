@@ -1,0 +1,10 @@
+@media print {
+  #editor,
+  #header,
+  #column-resizer {
+    display: none;
+  }
+  .sn-component {
+    outline: 0px;
+  }
+}
