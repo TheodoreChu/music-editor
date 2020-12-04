@@ -152,9 +152,8 @@ html {
   &.view {
     width: 100% !important;
   }
-  svg {
-    height: 100%;
-    width: 100%;
+  &.view.success {
+    text-align: center;
   }
   a {
     color: var(--sn-stylekit-info-color);
@@ -164,7 +163,7 @@ html {
     text-decoration: underline;
   }
   hr {
-    border: 0.5px solid var(--sn-stylekit-border-color);
+    border: 0.5px solid var(--sn-stylekit-secondary-contrast-background-color);
   }
 }
 

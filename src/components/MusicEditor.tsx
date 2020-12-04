@@ -49,6 +49,7 @@ type MusicEditorState = {
   text: string;
   mode: Mode;
   platform?: string;
+  success: boolean;
 };
 
 const debugMode = false;
@@ -58,6 +59,7 @@ const keyMap = new Map();
 const initialState = {
   mode: modes[1],
   text: 'options scale=1.0\n\ntabstave notation=true tablature=false\nnotes ',
+  success: false,
 };
 
 export default class MusicEditor extends React.Component<{}, MusicEditorState> {
@@ -117,7 +119,10 @@ export default class MusicEditor extends React.Component<{}, MusicEditorState> {
       },
       () => {
         this.saveNote();
-        this.renderMusic();
+        // Do not re-render music in edit-only mode
+        if (this.state.mode !== modes[0]) {
+          this.renderMusic();
+        }
       }
     );
   };
@@ -137,14 +142,26 @@ export default class MusicEditor extends React.Component<{}, MusicEditorState> {
     try {
       tab.parse(this.state.text);
       artist.render(renderer);
+      if (!this.state.success) {
+        this.setState({
+          success: true,
+        });
+      }
     } catch (e) {
-      if (view) {
-        const helpMessage = `<br/><br/><hr/><br/>Need help? Check out the <a href="https://vexflow.com/vextab/tutorial.html" target="_blank" rel="nofollow noreferrer noopener">VexTab Tutorial</a>.`;
-        view.innerHTML = e + helpMessage;
-      }
-      if (debugMode) {
-        console.log(e);
-      }
+      this.setState(
+        {
+          success: false,
+        },
+        () => {
+          if (view) {
+            const helpMessage = `<br/><br/><hr/><br/>Need help? Check out the <a href="https://vexflow.com/vextab/tutorial.html" target="_blank" rel="nofollow noreferrer noopener">VexTab Tutorial</a>.`;
+            view.innerHTML = e + helpMessage;
+          }
+          if (debugMode) {
+            console.log(e);
+          }
+        }
+      );
     }
   };
 
@@ -362,8 +379,11 @@ export default class MusicEditor extends React.Component<{}, MusicEditorState> {
             id={HtmlElementId.ColumnResizer}
           ></div>
           <section
-            className={this.state.mode.css}
+            className={
+              this.state.mode.css + (this.state.success ? ' success' : '')
+            }
             id={HtmlElementId.View}
+            tabIndex={0}
           ></section>
         </main>
       </div>
