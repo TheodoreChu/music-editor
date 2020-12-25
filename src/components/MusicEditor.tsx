@@ -1,6 +1,7 @@
 import React from 'react';
 import { EditorKit, EditorKitDelegate } from 'sn-editor-kit';
 import { Vex, VexTab, Artist } from 'vextab';
+import { debounce } from 'lodash';
 
 enum ComponentDataKey {
   Mode = 'mode',
@@ -45,12 +46,12 @@ enum MouseEvent {
   Up = 'mouseup',
 }
 
-type MusicEditorState = {
+interface EditorInterface {
   text: string;
   mode: Mode;
   platform?: string;
   success: boolean;
-};
+}
 
 const debugMode = false;
 
@@ -62,11 +63,14 @@ const initialState = {
 
 const keyMap = new Map();
 
-export default class MusicEditor extends React.Component<{}, MusicEditorState> {
+let scrollY: number;
+
+export default class MusicEditor extends React.Component<{}, EditorInterface> {
   editorKit: any;
   note: any;
+  saveTimer: NodeJS.Timeout | undefined;
 
-  constructor(props: any) {
+  constructor(props: EditorInterface) {
     super(props);
     this.state = initialState;
   }
@@ -78,6 +82,7 @@ export default class MusicEditor extends React.Component<{}, MusicEditorState> {
 
   configureEditorKit = () => {
     const delegate = new EditorKitDelegate({
+      /** This loads every time a different note is loaded */
       setEditorRawText: (text: string) => {
         this.setState(
           {
@@ -105,41 +110,68 @@ export default class MusicEditor extends React.Component<{}, MusicEditorState> {
     });
   };
 
-  saveNote = () => {
-    this.editorKit.onEditorValueChanged(this.state.text);
+  saveNote = (text: string) => {
+    /** This will work in an SN context, but may break the standalone editor,
+     * so we need to catch the error
+     */
+    try {
+      this.editorKit.onEditorValueChanged(text);
+    } catch (error) {
+      console.log('Error saving note:', error);
+    }
   };
 
   handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const target = event.target;
     const value = target.value;
+    this.saveText(value);
+  };
 
+  saveText = (text: string) => {
+    this.saveNote(text);
     this.setState(
       {
-        text: value,
+        text: text,
       },
       () => {
-        this.saveNote();
         // Do not re-render music in edit-only mode
         if (this.state.mode !== modes[0]) {
-          this.renderMusic();
+          if (this.saveTimer) {
+            clearTimeout(this.saveTimer);
+          }
+          debounce(() => {
+            this.renderMusic();
+          }, 300);
+          this.saveTimer = setTimeout(() => {
+            this.renderMusic();
+          }, 350);
         }
       }
     );
   };
 
   renderMusic = () => {
-    const view = document.getElementById(HtmlElementId.View);
-    if (view) {
-      view.innerHTML = '';
-    }
-    // Create VexFlow Renderer from canvas element with id #view
-    const Renderer = Vex.Flow.Renderer;
-    const renderer = new Renderer(view, Renderer.Backends.SVG);
-
-    // Initialize VexTab artist and parser.
-    const artist = new Artist(10, 10, 600, { scale: 0.8 });
-    const tab = new VexTab(artist);
     try {
+      const view = document.getElementById(HtmlElementId.View);
+      if (view) {
+        if (this.state.success) {
+          /** Only save scrollY if it's a success.
+           * Otherwise almost every change (e.g, typing C before the C/4)
+           * will reset the scroll, and the scroll won't be preserved.
+           */
+          scrollY = view.scrollTop;
+        }
+        view.innerHTML = '';
+      }
+
+      // Create VexFlow Renderer from canvas element with id #view
+      const Renderer = Vex.Flow.Renderer;
+      const renderer = new Renderer(view, Renderer.Backends.SVG);
+
+      // Initialize VexTab artist and parser.
+      const artist = new Artist(10, 10, 600, { scale: 0.8 });
+      const tab = new VexTab(artist);
+
       tab.parse(this.state.text);
       artist.render(renderer);
       if (!this.state.success) {
@@ -147,12 +179,17 @@ export default class MusicEditor extends React.Component<{}, MusicEditorState> {
           success: true,
         });
       }
+      if (view) {
+        // Keep the vertical scrolling
+        view.scrollTop = scrollY;
+      }
     } catch (e) {
       this.setState(
         {
           success: false,
         },
         () => {
+          const view = document.getElementById(HtmlElementId.View);
           if (view) {
             const helpMessage = `<br/><br/><hr/><br/>Need help? Check out the <a href="https://vexflow.com/vextab/tutorial.html" target="_blank" rel="nofollow noreferrer noopener">VexTab Tutorial</a>.`;
             view.innerHTML = e + helpMessage;
