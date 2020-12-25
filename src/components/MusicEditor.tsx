@@ -1,6 +1,25 @@
-import * as React from 'react';
+import React from 'react';
 import { EditorKit, EditorKitDelegate } from 'sn-editor-kit';
 import { Vex, VexTab, Artist } from 'vextab';
+
+enum ComponentDataKey {
+  Mode = 'mode',
+}
+
+enum HtmlElementId {
+  ColumnResizer = 'column-resizer',
+  Editor = 'editor',
+  EditorContainer = 'editor-container',
+  Header = 'header',
+  MusicEditor = 'music-editor',
+  View = 'view',
+  PrintButton = 'print-button',
+}
+
+enum HtmlClassName {
+  Dragging = 'dragging',
+  NoSelection = 'no-selection',
+}
 
 type Mode = {
   type: ModeType;
@@ -14,36 +33,17 @@ enum ModeType {
   View = 2,
 }
 
-enum MouseEvent {
-  Down = 'mousedown',
-  Move = 'mousemove',
-  Up = 'mouseup',
-}
-
-enum HtmlElementId {
-  ColumnResizer = 'column-resizer',
-  Editor = 'editor',
-  EditorContainer = 'editor-container',
-  Header = 'header',
-  MusicEditor = 'music-editor',
-  View = 'view',
-  PrintButton = 'print-button',
-}
-
-enum CssClassList {
-  Dragging = 'dragging',
-  NoSelection = 'no-selection',
-}
-
-enum ComponentDataKey {
-  Mode = 'mode',
-}
-
 const modes = [
   { type: ModeType.Edit, label: 'Edit', css: 'edit' } as Mode,
   { type: ModeType.Split, label: 'Split', css: 'split' } as Mode,
   { type: ModeType.View, label: 'View', css: 'view' } as Mode,
 ];
+
+enum MouseEvent {
+  Down = 'mousedown',
+  Move = 'mousemove',
+  Up = 'mouseup',
+}
 
 type MusicEditorState = {
   text: string;
@@ -54,13 +54,13 @@ type MusicEditorState = {
 
 const debugMode = false;
 
-const keyMap = new Map();
-
 const initialState = {
   mode: modes[1],
-  text: 'options scale=1.0\n\ntabstave notation=true tablature=false\nnotes ',
   success: false,
+  text: 'options scale=1.0\n\ntabstave notation=true tablature=false\nnotes ',
 };
+
+const keyMap = new Map();
 
 export default class MusicEditor extends React.Component<{}, MusicEditorState> {
   editorKit: any;
@@ -76,7 +76,7 @@ export default class MusicEditor extends React.Component<{}, MusicEditorState> {
     this.configureResizer();
   };
 
-  configureEditorKit() {
+  configureEditorKit = () => {
     const delegate = new EditorKitDelegate({
       setEditorRawText: (text: string) => {
         this.setState(
@@ -103,7 +103,7 @@ export default class MusicEditor extends React.Component<{}, MusicEditorState> {
       mode: 'plaintext',
       supportsFilesafe: false,
     });
-  }
+  };
 
   saveNote = () => {
     this.editorKit.onEditorValueChanged(this.state.text);
@@ -173,7 +173,8 @@ export default class MusicEditor extends React.Component<{}, MusicEditorState> {
       if (debugMode) {
         console.log('loaded savedMode: ' + savedMode);
       }
-      if (savedMode) {
+      // We can't use if(savedMode) because it would return false for 0
+      if (typeof savedMode === 'number') {
         this.setModeFromModeType(savedMode);
       }
       this.setState(
@@ -240,7 +241,7 @@ export default class MusicEditor extends React.Component<{}, MusicEditorState> {
   };
 
   configureResizer = () => {
-    const musicEditor = document.getElementById(HtmlElementId.MusicEditor);
+    const MusicEditor = document.getElementById(HtmlElementId.MusicEditor);
     const editor = document.getElementById(HtmlElementId.Editor);
     const columnResizer = document.getElementById(HtmlElementId.ColumnResizer);
     let pressed = false;
@@ -253,8 +254,8 @@ export default class MusicEditor extends React.Component<{}, MusicEditorState> {
     if (editor && columnResizer) {
       columnResizer.addEventListener(MouseEvent.Down, (event) => {
         pressed = true;
-        columnResizer.classList.add(CssClassList.Dragging);
-        editor.classList.add(CssClassList.NoSelection);
+        columnResizer.classList.add(HtmlClassName.Dragging);
+        editor.classList.add(HtmlClassName.NoSelection);
       });
     }
 
@@ -263,11 +264,11 @@ export default class MusicEditor extends React.Component<{}, MusicEditorState> {
         return;
       }
       let x = event.clientX;
-      if (musicEditor) {
+      if (MusicEditor) {
         if (x < resizerWidth / 2 + safetyOffset) {
           x = resizerWidth / 2 + safetyOffset;
-        } else if (x > musicEditor.offsetWidth - resizerWidth - safetyOffset) {
-          x = musicEditor.offsetWidth - resizerWidth - safetyOffset;
+        } else if (x > MusicEditor.offsetWidth - resizerWidth - safetyOffset) {
+          x = MusicEditor.offsetWidth - resizerWidth - safetyOffset;
         }
       }
 
@@ -286,14 +287,20 @@ export default class MusicEditor extends React.Component<{}, MusicEditorState> {
       if (pressed) {
         pressed = false;
         if (columnResizer) {
-          columnResizer.classList.remove(CssClassList.Dragging);
+          columnResizer.classList.remove(HtmlClassName.Dragging);
         }
         if (editor) {
-          editor.classList.remove(CssClassList.NoSelection);
+          editor.classList.remove(HtmlClassName.NoSelection);
         }
       }
     });
   };
+
+  onBlur = () => {
+    keyMap.clear();
+  };
+
+  onFocus = (e: React.FocusEvent) => {};
 
   onKeyDown = (event: React.KeyboardEvent) => {
     keyMap.set(event.key, true);
@@ -307,10 +314,6 @@ export default class MusicEditor extends React.Component<{}, MusicEditorState> {
 
   onKeyUp = (event: React.KeyboardEvent) => {
     keyMap.delete(event.key);
-  };
-
-  onBlur = () => {
-    keyMap.clear();
   };
 
   logDebugMessage = (message: string, object: any) => {

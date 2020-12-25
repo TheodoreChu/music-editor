@@ -14,13 +14,14 @@
 
 body,
 html {
+  background-color: transparent;
+  background-color: var(--sn-stylekit-background-color);
   font-family: var(--sn-stylekit-monospace-font);
+  font-size: var(--sn-stylekit-base-font-size);
   height: 100%;
-  width: 100%;
   margin: 0;
   padding: 0;
-  font-size: var(--sn-stylekit-base-font-size);
-  background-color: transparent;
+  width: 100%;
 }
 
 * {
@@ -29,15 +30,19 @@ html {
 }
 
 #music-editor {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  min-height: 100vh;
-  max-height: 100vh;
-  flex-direction: column;
-  font-size: var(--sn-stylekit-font-size-editor);
   background-color: var(--sn-stylekit-editor-background-color);
   color: var(--sn-stylekit-editor-foreground-color);
+  display: flex;
+  flex-direction: column;
+  font-size: var(--sn-stylekit-font-size-editor);
+  height: 100%;
+  max-height: 100vh;
+  min-height: 100vh;
+  width: 100%;
+
+  @media screen and (max-width: 420px) {
+    min-height: -webkit-fill-available;
+  }
 }
 
 #header {

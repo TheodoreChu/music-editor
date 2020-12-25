@@ -1,7 +1,7 @@
 {
   "name": "music-editor",
   "version": "0.1.1",
-  "description": "Music Editor for Standard Notes. Write music with VexTab and VexFlow",
+  "description": "Music Editor for Standard Notes. Write music and guitar tablature with VexTab and VexFlow",
   "keywords": [
     "Music Editor",
     "Standard Notes",
