@@ -62,18 +62,17 @@ html {
   }
 
   .button {
-    padding: 4px 12px;
-    margin-right: 4px;
     border: 1px solid var(--sn-component-inner-border-color);
     border-radius: 0;
-
-    &.selected {
-      font-weight: bold;
-    }
+    margin-right: 4px;
+    padding: 4px 12px;
   }
 
-  .sk-label {
-    font-size: 13px;
+  .label {
+    display: block;
+    font-size: 14px;
+    line-height: 20px;
+    text-align: center;
     width: 50px;
   }
 
@@ -83,6 +82,13 @@ html {
     top: 5px;
     @media screen and (max-width: 500px) {
       display: none;
+    }
+  }
+  .icon-button {
+    display: inline-flex;
+    svg {
+      opacity: 0.75;
+      margin-top: auto;
     }
   }
 }

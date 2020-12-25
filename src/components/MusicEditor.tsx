@@ -2,6 +2,7 @@ import React from 'react';
 import { EditorKit, EditorKitDelegate } from 'sn-editor-kit';
 import { Vex, VexTab, Artist } from 'vextab';
 import { debounce } from 'lodash';
+import { PrintIcon } from './Icons';
 
 enum ComponentDataKey {
   Mode = 'mode',
@@ -383,18 +384,22 @@ export default class MusicEditor extends React.Component<{}, EditorInterface> {
                       ? 'selected info'
                       : 'sk-secondary-contrast')
                   }
+                  title={'Turn on ' + mode.label + ' Mode'}
                 >
-                  <div className="sk-label">{mode.label}</div>
+                  <div className="label">{mode.label}</div>
                 </button>
               ))}
             </div>
           </div>
           <button
-            className={'sk-button button sk-secondary-contrast'}
+            className={'sk-button button sk-secondary-contrast icon-button'}
             id={HtmlElementId.PrintButton}
             onClick={() => this.print()}
+            title="Print rendered music"
           >
-            <div className="sk-label">{'Print'}</div>
+            <span>&nbsp;</span>
+            <PrintIcon role="button" />
+            <span>&nbsp;</span>{' '}
           </button>
         </div>
         <main
