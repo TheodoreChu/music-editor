@@ -17,7 +17,7 @@
 
 The Music Editor is an **unofficial** [editor](https://standardnotes.org/help/77/what-are-editors) for [Standard Notes](https://standardnotes.org), a free, [open-source](https://standardnotes.org/knowledge/5/what-is-free-and-open-source-software), and [end-to-end encrypted](https://standardnotes.org/knowledge/2/what-is-end-to-end-encryption) notes app.
 
-You can find the demo at [demo.musiceditor.net](https://demo.musiceditor.net) or learn more at [musiceditor.net](https://musiceditor.net).
+Try the demo at [demo.musiceditor.net](https://demo.musiceditor.net) or learn more at [musiceditor.net](https://musiceditor.net).
 
 The Music Editor is used to write music and guitar tablature using [VexTab](https://vexflow.com/vextab/tutorial.html).
 
