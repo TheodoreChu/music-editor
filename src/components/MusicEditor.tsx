@@ -2,7 +2,7 @@ import React from 'react';
 import { EditorKit, EditorKitDelegate } from 'sn-editor-kit';
 import { Vex, VexTab, Artist } from 'vextab';
 import { debounce } from 'lodash';
-import { PrintIcon } from './Icons';
+import { HelpIcon, PrintIcon } from './Icons';
 
 enum ComponentDataKey {
   Mode = 'mode',
@@ -15,6 +15,7 @@ enum HtmlElementId {
   Header = 'header',
   MusicEditor = 'music-editor',
   View = 'view',
+  HelpButton = 'help-button',
   PrintButton = 'print-button',
 }
 
@@ -391,6 +392,22 @@ export default class MusicEditor extends React.Component<{}, EditorInterface> {
               ))}
             </div>
           </div>
+          <a
+            href="https://musiceditor.net"
+            target="_blank"
+            rel="noopener noreferrer"
+            tabIndex={-1}
+          >
+            <button
+              className={'sk-button button sk-secondary-contrast icon-button'}
+              id={HtmlElementId.HelpButton}
+              title={'Help'}
+            >
+              <span>&nbsp;</span>
+              <HelpIcon role="button" />
+              <span>&nbsp;</span>
+            </button>
+          </a>
           <button
             className={'sk-button button sk-secondary-contrast icon-button'}
             id={HtmlElementId.PrintButton}
@@ -399,7 +416,7 @@ export default class MusicEditor extends React.Component<{}, EditorInterface> {
           >
             <span>&nbsp;</span>
             <PrintIcon role="button" />
-            <span>&nbsp;</span>{' '}
+            <span>&nbsp;</span>
           </button>
         </div>
         <main
